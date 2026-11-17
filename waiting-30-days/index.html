@@ -1,0 +1,531 @@
+<title>等候的三十天</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@500;700&family=Noto+Sans+SC:wght@400;500;700&family=Inter:wght@400;600&display=swap">
+<style>
+/* Layout: one calm reading column; a daily rhythm strip, then four weekly sections of expandable day entries with a reading guide */
+:root {
+  --bg: #f2f4f3;
+  --surface: #ffffff;
+  --fg: #1d3134;
+  --muted: #5d6f71;
+  --line: #d7dfdd;
+  --accent: #9a7420;
+  --accent-soft: #f3ead6;
+  --sage: #557a6c;
+  --sage-soft: #e3ece8;
+  --f-display: "Noto Serif SC", "Songti SC", "STSong", serif;
+  --f-body: "Noto Sans SC", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+  --f-latin: "Inter", system-ui, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #121819; --surface: #1a2224; --fg: #e2e8e6; --muted: #9aaaa8; --line: #2c3739;
+    --accent: #d8b867; --accent-soft: #2d2818; --sage: #8fbcaa; --sage-soft: #1d2a26; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #121819; --surface: #1a2224; --fg: #e2e8e6; --muted: #9aaaa8; --line: #2c3739;
+  --accent: #d8b867; --accent-soft: #2d2818; --sage: #8fbcaa; --sage-soft: #1d2a26; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body {
+  background: var(--bg); color: var(--fg);
+  font-family: var(--f-body); font-size: 16px; line-height: 1.75;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.wrap { max-width: 720px; margin: 0 auto; padding-block: 48px 72px; display: flex; flex-direction: column; gap: 48px; }
+h1, h2, h3 { font-family: var(--f-display); text-wrap: balance; margin: 0; line-height: 1.35; }
+h1 { font-size: 2.2rem; font-weight: 700; }
+h2 { font-size: 1.4rem; font-weight: 700; }
+p { margin: 0; }
+.eyebrow { font-family: var(--f-latin); font-size: .78rem; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); font-weight: 600; }
+.lead { color: var(--muted); max-width: 36em; }
+header { display: flex; flex-direction: column; gap: 14px; }
+.verse { font-family: var(--f-display); font-size: 1.05rem; border-left: 2px solid var(--accent); padding-left: 14px; color: var(--fg); }
+.verse small { display: block; font-family: var(--f-body); color: var(--muted); font-size: .82rem; margin-top: 2px; }
+
+.status { display: grid; grid-template-columns: 1fr auto; gap: 12px 20px; align-items: center; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 18px 20px; }
+.status .bar { grid-column: 1 / -1; height: 6px; background: var(--line); border-radius: 3px; overflow: hidden; }
+.status .bar span { display: block; height: 100%; width: 0; background: var(--accent); transition: width .4s ease; }
+.status .count { font-family: var(--f-latin); font-variant-numeric: tabular-nums; font-weight: 600; }
+.status label { font-size: .88rem; color: var(--muted); display: flex; gap: 8px; align-items: center; flex-wrap: wrap; justify-content: flex-end; }
+.status input[type=date] { font: inherit; color: var(--fg); background: var(--bg); border: 1px solid var(--line); border-radius: 6px; padding: 4px 8px; }
+.today-note { grid-column: 1 / -1; font-size: .9rem; color: var(--sage); }
+
+.rhythm { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; }
+.step { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 12px 14px; display: flex; flex-direction: column; gap: 2px; }
+.step b { font-family: var(--f-display); font-size: 1.02rem; }
+.step .min { font-family: var(--f-latin); font-size: .75rem; color: var(--accent); font-weight: 600; }
+.step span:last-child { font-size: .86rem; color: var(--muted); line-height: 1.55; }
+section { display: flex; flex-direction: column; gap: 16px; }
+
+.prayer4 { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 10px; }
+.prayer4 div { background: var(--sage-soft); border-radius: 8px; padding: 12px 14px; font-size: .92rem; }
+.prayer4 b { display: block; color: var(--sage); font-size: .95rem; }
+
+.collect { background: var(--accent-soft); border-radius: 10px; padding: 18px 20px; font-family: var(--f-display); font-size: 1rem; line-height: 1.9; }
+.collect small { display: block; font-family: var(--f-body); font-size: .8rem; color: var(--muted); margin-top: 8px; line-height: 1.6; }
+
+.week-head { display: flex; flex-direction: column; gap: 4px; border-bottom: 1px solid var(--line); padding-bottom: 10px; }
+.week-head p { color: var(--muted); font-size: .92rem; }
+.days { display: flex; flex-direction: column; gap: 8px; }
+details.day { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; }
+details.day.done { opacity: .72; }
+details.day.today { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
+details.day.review { background: var(--accent-soft); border-color: transparent; }
+summary { list-style: none; cursor: pointer; display: grid; grid-template-columns: auto auto 1fr auto; gap: 12px; align-items: center; padding: 12px 14px; }
+summary::-webkit-details-marker { display: none; }
+summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 10px; }
+.chk { width: 22px; height: 22px; accent-color: var(--accent); cursor: pointer; margin: 0; }
+.dnum { font-family: var(--f-latin); font-variant-numeric: tabular-nums; font-size: .78rem; font-weight: 600; color: var(--muted); width: 3.2em; }
+.stitle { min-width: 0; display: flex; flex-direction: column; line-height: 1.45; }
+.stitle b { font-family: var(--f-display); font-weight: 500; font-size: 1.02rem; }
+.stitle span { font-size: .8rem; color: var(--muted); font-family: var(--f-latin); }
+.caret { color: var(--muted); transition: transform .2s; font-size: .8rem; }
+details[open] .caret { transform: rotate(90deg); }
+.body { padding: 14px 18px 18px; display: flex; flex-direction: column; gap: 14px; border-top: 1px dashed var(--line); }
+.loc { font-size: .8rem; color: var(--muted); font-family: var(--f-latin); }
+.guide { display: flex; flex-direction: column; gap: 10px; background: var(--bg); border-radius: 8px; padding: 14px 16px; }
+.guide h3 { font-size: .95rem; color: var(--accent); font-weight: 700; }
+.guide p { font-size: .95rem; line-height: 1.85; }
+.guide p b { font-family: var(--f-display); color: var(--sage); margin-right: 4px; }
+.look { font-size: .9rem; color: var(--sage); border-top: 1px solid var(--line); padding-top: 8px; }
+.guide.keller { background: var(--sage-soft); }
+.guide.keller h3 { color: var(--sage); }
+.guide .krange { font-size: .8rem; color: var(--muted); font-family: var(--f-latin); margin-top: -6px; }
+.row { display: grid; grid-template-columns: 4.5em 1fr; gap: 10px; font-size: .94rem; }
+.row > span:first-child { font-size: .78rem; color: var(--accent); font-weight: 700; letter-spacing: .04em; padding-top: 3px; }
+.row > span:last-child { min-width: 0; }
+.row.q > span:last-child { font-family: var(--f-display); }
+.tag { display: inline-block; font-size: .72rem; background: var(--sage-soft); color: var(--sage); border-radius: 4px; padding: 0 6px; margin-left: 6px; vertical-align: 2px; font-family: var(--f-body); }
+
+footer { font-size: .85rem; color: var(--muted); display: flex; flex-direction: column; gap: 8px; border-top: 1px solid var(--line); padding-top: 20px; }
+@media (max-width: 480px) {
+  h1 { font-size: 1.8rem; }
+  .status { grid-template-columns: 1fr; }
+  .status label { justify-content: flex-start; }
+  .row { grid-template-columns: 1fr; gap: 0; }
+  .body { padding-inline: 14px; }
+  .guide { padding: 12px; }
+}
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow">Passion and Purity · 30 天祷告与阅读</div>
+    <h1>等候的三十天</h1>
+    <p class="lead">跟着伊丽莎白·艾略特读完《激情与纯洁》全书 43 章。每天先看中文导读，再读英文原文。其中四天另配了凯勒《婚姻的意义》第 7 章《单身与婚姻》的补充阅读。在关系还没有确认的这段时间，把心交给神，学习交托、分辨和等待。</p>
+    <p class="verse">“不要惊动、不要叫醒我所亲爱的，等他自己情愿。”<small>雅歌 2:7，作者在第 2 章里写到这节经文怎样影响了她</small></p>
+  </header>
+
+  <div class="status" aria-live="polite">
+    <div class="count" id="count">已完成 0 / 30 天</div>
+    <label for="start">开始日期 <input type="date" id="start"></label>
+    <div class="bar"><span id="bar"></span></div>
+    <div class="today-note" id="todayNote">选一个开始日期，页面会自动展开当天的内容。</div>
+  </div>
+
+  <section>
+    <h2>每天的节奏</h2>
+    <p class="lead">每天大约 40 分钟。原文请在你自己的电子书里读，每天的条目里标了 PDF 页码，也标了 .md 文件的行数。</p>
+    <div class="rhythm">
+      <div class="step"><span class="min">3 分钟</span><b>安静</b><span>放下手机，把心里的思绪交给神</span></div>
+      <div class="step"><span class="min">5 分钟</span><b>读导读</b><span>先了解这一章讲了什么</span></div>
+      <div class="step"><span class="min">15–20 分钟</span><b>读原文</b><span>读当天的章节，划下触动你的句子</span></div>
+      <div class="step"><span class="min">5 分钟</span><b>读经</b><span>慢读当天的经文</span></div>
+      <div class="step"><span class="min">10 分钟</span><b>祷告</b><span>按下面四个方向祷告</span></div>
+      <div class="step"><span class="min">5 分钟</span><b>日记</b><span>写下默想问题的回答</span></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>每天祷告的四个方向</h2>
+    <div class="prayer4">
+      <div><b>为自己的心</b>求神成为我最深的满足，不把婚姻当作填补空缺的东西。</div>
+      <div><b>为分辨</b>求神给我清明的眼光，看清他真实的属灵生命和品格。</div>
+      <div><b>为他</b>为他的信仰、工作和家人祝福，不在祷告里替他做决定。</div>
+      <div><b>交托时间</b>求神按祂的时间开路或关门，并且给我平安接受。</div>
+    </div>
+  </section>
+
+  <section>
+    <h2>这个月每天用的祷文</h2>
+    <div class="collect">
+      全能的神，唯有你能使罪人不受约束的意志和情感归于正轨。求你赐恩给你的子民，使我们爱你所命令的，渴慕你所应许的；好叫我们在世事纷繁变迁之中，心能坚定在真喜乐所在之处。奉我们的主耶稣基督，祂与你和圣灵同活同掌权，独一的神，从今直到永远。阿们。
+      <small>出自《公祷书》大斋期第五主日的短祷文，作者在第 4 章引用。中文是这里的意译。</small>
+    </div>
+  </section>
+
+  <div id="weeks"></div>
+
+  <footer>
+    <p>凯勒补充阅读安排在第 1、12、21、25 天，页码按你电脑上那份中文 PDF 计算。</p>
+    <p>导读是根据原书内容用中文写的概述，帮助你理解每章的故事和要点，不是原文翻译。原书受版权保护，请读你自己的版本；读到看不懂的段落，可以随时问 Claude。</p>
+    <p>如果中途关系有了变化，比如他表明了心意，或者你感到需要放下，可以照常读完，同时和一位信任的属灵长辈分享你的祷告日记。</p>
+    <p>勾选记录只存在你当前使用的浏览器里，换设备或清除浏览数据后会重置。</p>
+  </footer>
+</div>
+
+<script>
+const WEEKS = [
+  { title: "第一周　交出主权", sub: "愿意接受神的选择，而不是我自己的选择", from: 1, to: 7 },
+  { title: "第二周　学习等候", sub: "在分离、不确定和渴望中安静下来", from: 8, to: 15 },
+  { title: "第三周　诚实面对自己的心", sub: "看清自己的动机，不操纵，不自欺", from: 16, to: 22 },
+  { title: "第四周　纯洁、界限与信靠", sub: "为将来的婚姻持守，也把结局交给神", from: 23, to: 30 },
+];
+
+const DAYS = [
+  { d:1, ch:"第 1 章", en:"Me, Lord? Single?", zh:"主啊，我要单身吗？", loc:"PDF 第 19–23 页（书上页码 17–21）· .md 文件第 403 行",
+    g:[
+      "大学四年级，作者终于有了一间单人小房间，窗外是饭堂后面的垃圾桶和一群松鼠。她已经确定神呼召她做宣教士，方向是语言学，但还有一件事悬而未决：神会不会要她一生单身？这个问题挡在她的希腊文课本和圣经之间，常常闯进她的祷告和梦里。她几个月里只和神谈这件事，没有告诉别人。",
+      "她和两位室友都认为，单身就意味着守贞。作者说，这不是因为那个年代的人天真，而是因为她们是基督徒，看重性的神圣。她也想清楚了自己想要的丈夫：一个和她一样珍惜纯洁的人。",
+      "她的结论是：时代变了，但人心深处对“恒久”的渴望没有变。到处抓取满足的人，最后哪里都找不到满足。"],
+    look:"她把“单身”的问题带进“密室”，单独和神谈了很久。你也可以把对这位弟兄的心意，先只带到神面前。",
+    k:{ t:"单身之美好", r:"《婚姻的意义》第 7 章开头至“单身之美好”一节结束 · PDF 第 192–197 页",
+      g:[
+        "凯勒在曼哈顿植堂时，八成以上的会众是单身，他却连续讲了九次婚姻。他的理由是：单身的人如果不能平衡地看待婚姻，就过不好单身生活，要么对婚姻期待过高，要么期待太低。",
+        "他解释林前 7:29–31 的“时候减少了”：保罗讲的是两个世代的交叠。神的国已经借着基督来到，但旧世界还没有结束。所以结婚不必过分激动，没结婚也不必过分沮丧，因为只有基督是灵魂真正的配偶，只有天国是真正的家。",
+        "凯勒说，基督教是第一个把单身看作美好生活方式的信仰：耶稣和保罗都单身，早期教会供养寡妇，让她们不必被迫再嫁。单身的基督徒是在向世界见证：我的未来靠的是神，不是家庭。",
+        "他引用一位单身姐妹 Paige Benton Brown 的文章，反驳教会里常听到的几句话，比如“等你单单以神为满足，祂就会给你那个人”“你太挑剔了”。她的意思是：我单身，不是因为属灵上不够成熟，也不是因为太成熟，而是因为神是好的，单身是祂此刻给我最好的安排。"],
+      look:"教会里那几句常听到的话，你听别人说过，或者对自己说过哪一句？" },
+    v:"马太福音 6:6", p:"求神成为我心里最深的满足，在祂里面我不缺什么。",
+    q:"我现在最渴望的是什么？如果神说“再等等”，我的心会怎样？" },
+  { d:2, ch:"第 2 章", en:"The Life I Owe", zh:"我所亏欠的生命", loc:"PDF 第 24–27 页（书上页码 22–25）· .md 文件第 563 行",
+    g:[
+      "一位英国讲员来学校讲道，留下两件事给她。一是雅歌 2:7“不要惊动、不要叫醒爱情，等它自己情愿”，意思是在神的旨意里“安睡”，不要为择偶焦躁。二是要写属灵日记。她都照做了，把日记叫作“一俄梅珥吗哪”（出埃及记 16:32），用来记下神每天的供应。",
+      "本章大部分是她日记里摘抄的经文和诗歌。核心问题来自一句诗歌：“我把亏欠你的生命还给你。”为什么说亏欠？因为我们是重价买来的（林前 6:19–20），是神所造、所救赎、按名呼召的（以赛亚书 43 章）。",
+      "有个女孩问作者：可不可以对神说“你给我丈夫，我就去做宣教士”？她说不可以。我们没有和造物主讨价还价的资格。本章以她的祷告结束：她已经对神说了“永远的是”，求神不要让她手扶着犁又向后看。"],
+    look:"这一章英文里引用的经文和诗歌很多，读慢一点，也可以学她把触动你的经文抄进日记。",
+    v:"雅歌 2:7；以赛亚书 43:1–3", p:"把我对未来的计划，一项一项交给神。",
+    q:"有哪些计划或想象，是我今天愿意交出来的？", act:"今天开始写一本祷告日记" },
+  { d:3, ch:"第 3 章", en:"Passion Is a Battleground", zh:"情感是战场", loc:"PDF 第 28–32 页（书上页码 26–30）· .md 文件第 696 行",
+    g:[
+      "作者说，她迫切求纯洁之后，接踵而来的是困惑。灵魂的仇敌最受不了人渴望纯洁，所以人的情感就成了战场。神并不阻止这场争战，祂要我们学会使用属灵的兵器。",
+      "她公开了大学时的日记：和一个叫 Hal 的男生约会、提出分手、后悔、想道歉，反反复复；中间一行写着第一次认识吉姆，“谈得很好，很棒的人”。她回头看觉得那时的自己很傻，但正是在这些心事里，她的心被筛、被洗、被显明。",
+      "她还引用一封读者来信：一个女孩遇见一位很属灵的弟兄，心里马上对神说“我就要这一个，谢谢你”，后来对方退缩，她花了好几个月才走出来。作者说这类故事千百年都一样：女人盼望被回应、被保护，男人想漫游、想征服，心底却也渴望一个家。"],
+    look:"读者来信里的那个女孩，你可能会在她身上看到自己。章末那首“求你洁净我”的老诗歌，可以作今天的祷告。",
+    v:"以弗所书 6:10–13；诗篇 51:10", p:"求神洁净我的心思意念，在争战中站立得住。",
+    q:"我在什么时候最容易让思绪失控？" },
+  { d:4, ch:"第 4 章", en:"Unruly Affections", zh:"不受约束的情感", loc:"PDF 第 33–37 页（书上页码 31–35）· .md 文件第 843 行",
+    g:[
+      "本章以公祷书的祷文开头，就是本页每天用的那一篇。作者说，世上最难管的就是自己的意志和情感；要让它们归于正轨，一定要付代价。",
+      "然后她讲自己怎样一点点注意到吉姆：摔跤场上怎么也压不倒的“橡皮人”，排队打饭时手里拿着卡片背希腊文和经文，热心宣教，爱唱诗、爱朗读诗歌，最爱的是神。他开始在希腊文课上坐到她旁边；有一次在饭堂对她一笑，她就高兴了一整天。",
+      "吉姆约她喝可乐，结果是翻开圣经，以弟兄的身份劝她不要太拘谨。她有点受伤，却很欣赏他敢说真话。她发现自己可能爱上了他，又觉得这对一心去宣教的人不太明智，于是对自己说：怎样把爱献在神脚前？等我真的恋爱了再说吧。"],
+    look:"留意她怎样在远处观察一个人的品格：怎样用时间，怎样对待事奉，怎样对人说真话。这对你现在很有参考价值。",
+    v:"诗篇 86:11", p:"用上面的祷文慢慢祷告，把心里的好感诚实地带到神面前。",
+    q:"我对他的好感，现在在我心里占了多大的位置？", act:"把祷文抄在日记本第一页" },
+  { d:5, ch:"第 5–6 章", en:"Does God Want Everything? · The Snake’s Reasoning", zh:"神要全部吗？·蛇的推理", loc:"PDF 第 38–44 页（书上页码 36–42）· .md 文件第 1009 行",
+    g:[
+      "【第 5 章】神在旧约试验亚伯拉罕，在新约对那个少年人说“你若愿意做完全人”。作者说，这些道理她头脑里都同意，可当她的心动了，问题就成了她自己的：你愿意走全程吗？她引用 Lilias Trotter：真正的交出，不只是放弃不合法的东西，而是连神所赐、合法而美好的东西也献上。神全给，也全要。",
+      "她说，决定一生方向的问题是：我真正想要的是什么？是我想要的，还是祂想要的？五饼二鱼要先被擘开，才能喂饱众人。",
+      "【第 6 章】一个漂亮女孩深夜来找作者，说一定要嫁给又帅又有钱的人，因为“耶稣爱我，要我快乐”。作者反问：那神会把穷而不帅的男人只给祂不爱的女人吗？问题在于，我们先决定什么会让自己快乐，得不到就认定神不爱我们。这正是伊甸园里蛇的推理：神很小气。还有人问单身是不是“不足以深度成长”，作者说：那单身的耶稣是怎么成长的？"],
+    look:"第 6 章的对话很生动。想想你心里有没有“神不给我，是因为祂小气”的声音。",
+    v:"创世记 22:1–2；约翰福音 6:9–11", p:"承认我心里对神良善的怀疑，求神让我重新相信祂是好的。",
+    q:"我心里有没有“神亏欠我”的声音？" },
+  { d:6, ch:"第 7–8 章", en:"The First Date · Unfailing Love", zh:"第一次约会·不变的慈爱", loc:"PDF 第 45–50 页（书上页码 43–48）· .md 文件第 1221 行",
+    g:[
+      "【第 7 章】吉姆第一次约她，是去芝加哥参加宣教聚会。之后吉姆写信，为那晚自己某些越界的地方道歉。她本来以为自己正在学习“在神旨意里安睡”，结果却被完全唤醒了。日记里满是挣扎：她愿意遵行神的旨意，却分辨不出自己的愿望是不是应该被挖掉。她借大卫的话对神说：我不用白得之物献祭，这是我的心。",
+      "【第 8 章】常有人问：我都不知道自己想做什么，怎么知道神要我做什么？作者说：为什么不先告诉神“你说什么我都做”？你是仆人，祂是主人。另一条路是“我想要就拿”，看起来痛快，结局却是忧伤。",
+      "她承认那几年常为走错路而焦虑，但多年后确信：一颗定意遵行父旨意的心，不必怕失败。牧人比羊更在乎把羊领到对的地方。"],
+    look:"第 7 章她形容自己“被愿望堵住了”的那段，写得很真实，也很好笑。",
+    v:"诗篇 32:8–10；彼得前书 5:7", p:"对神说：“主啊，你说什么，我都愿意。”",
+    q:"我是不是先定好了自己想要的，再求神盖章？" },
+  { d:7, ch:"第 9 章", en:"The Revelation", zh:"表白", loc:"PDF 第 51–54 页（书上页码 49–52）· .md 文件第 1384 行",
+    g:[
+      "宣教团契野餐后，吉姆送她回宿舍，走了半条街突然说：我们得把对彼此的感觉弄清楚。她愣住了：原来他早就喜欢她，还以为她看得出来。两人回到湖边，谈了七个小时。",
+      "作者说那天像一道彩虹，由阳光和雨组成。阳光是知道吉姆爱她；雨是他同时说出的另一个事实：神呼召他暂时单身，也许一辈子，也许只到他在宣教工场有了实际经验为止。",
+      "回到房间，她在日记里只抄经文，不敢多写感受，怕写下来的感情以后还得割舍。她说这样做没有错：把房子建在磐石上，就是先听神的话再去行，而不是只听自己的感觉。"],
+    look:"开头那段话值得多读几遍：顺服的心终会得着分辨“冲突”与“和谐”的智慧，但过程可能缓慢而痛苦。",
+    v:"箴言 3:5–6；诗篇 73:25", p:"求神给我分辨“冲突”和“和谐”的智慧。",
+    q:"如果他的心意或时间和我期待的不同，我还能信靠神吗？" },
+
+  { d:8, ch:"第 10–11 章", en:"Does God Notice? · Oozing Ache", zh:"神留意吗？·隐隐的痛", loc:"PDF 第 55–59 页（书上页码 53–57）· .md 文件第 1502 行",
+    g:[
+      "【第 10 章】她为“圣洁的和谐”祷告。吉姆在湖边对她说：如果我结婚，我知道会是谁；但我不能求婚，不能要你做任何承诺，甚至不能要你等，我已经把你和我对你的感情都交给神了。他也坦白承认身体上的渴望。她问：神会留意两个大学生的心事吗？作者用以赛亚书 40 章回答：神按名呼唤众星，一个都不缺。",
+      "【第 11 章】日记里写着读不进书、睡不着、吃不下。吉姆写了一首祷告诗，求神在汹涌的情感中为他筑起信心的城墙。两人谈到各自的“准则”：吉姆根据马太福音 19:12，愿意为天国的缘故不娶；她根据以赛亚书 54:5 和林前 7:34–35。",
+      "他们发现两人的想法惊人地一致，却彼此提醒：世上有很多罪，都是用“巧合”“注定”来辩护的。他们决定恒切祷告，耐心等候神把路显明。"],
+    look:"第 11 章结尾关于“巧合”的提醒，对正在观察一段关系的人特别重要。",
+    v:"以赛亚书 40:26–31", p:"求神在我软弱时赐新力，也让我不被巧合牵着走。",
+    q:"我有没有把一些巧合，解读成神的印证？" },
+  { d:9, ch:"第 12 章", en:"Holding Pattern", zh:"盘旋等候", loc:"PDF 第 60–64 页（书上页码 58–62）· .md 文件第 1664 行",
+    g:[
+      "作者开始学习等候。她提议分开后先不要频繁通信，让距离和沉默帮助两人冷静分辨。吉姆想了一会儿，说起那天早上读到亚伯拉罕献以撒：所以我把你放在祭坛上了。月亮升起，一个石十字架的影子正好落在他们中间。",
+      "她说，等候神，就是愿意带着一个没有答案的问题生活，每次它冒出来，就把心举向神。说服自己做一个仓促的决定，有时比耐心等候容易。",
+      "最难的是安静。她心里满是想对吉姆说的话，却忍住了，只和他一起欣赏阳光、湖水和鸟。她用飞机降落前被塔台要求在空中绕圈作比喻，并引用 S. D. Gordon 对等候的描述：坚持、忍耐、仰望、预备好去顺服、安静聆听。"],
+    look:"章末那两行简短的对话，很适合抄进日记。",
+    v:"诗篇 25:4–5；诗篇 62:5–8", p:"今天的祷告里留 5 分钟，什么都不说，只是安静。",
+    q:"等候的时候，我最常做的是焦虑、幻想，还是安静？" },
+  { d:10, ch:"第 13–14 章", en:"Material for Sacrifice · Honor Above Passion", zh:"献祭的材料·荣誉高于激情", loc:"PDF 第 65–71 页（书上页码 63–69）· .md 文件第 1818 行",
+    g:[
+      "【第 13 章】毕业前几天，吉姆第一次碰她，只是用手指背轻轻划过她的脸颊。那天的灵修经文是“凡能见火的，要叫它经火”。她引用 Oswald Chambers 讲大卫把勇士冒死打来的伯利恒井水倒在地上：爱、友情、属灵的祝福，若留给自己就会败坏我们，要在心意上倒给神，哪怕看起来像浪费。",
+      "作者说，孤单本身、渴望本身，都可以成为献给神的祭物。在车站，她心里一部分想要他拥抱亲吻，另一部分说不。最后他们只是握了手。",
+      "【第 14 章】作者问：这个故事今天看来是不是很奇怪？也许是因为一种荣誉感已经失落了：忠于固定的价值，愿意为此付上自我牺牲。越有可能成就美善的力量，也越可能成就邪恶；正因为这份爱是美好的恩赐，更需要被约束，好在纯洁中重生。吉姆认为保护她是他的责任，她认为安静等候、不去引诱是她的本分。"],
+    look:"第 14 章结尾 Christina Rossetti 的十四行诗：爱神最多，所以也能好好爱你。",
+    v:"民数记 31:23；罗马书 12:1", p:"把这份感情放在祭坛上，求神炼净它。",
+    q:"有什么是我愿意为了更高的爱而放下的？" },
+  { d:11, ch:"第 15–16 章", en:"Little Deaths · Life From Death", zh:"小小的死·从死里得生", loc:"PDF 第 72–79 页（书上页码 70–77）· .md 文件第 1995 行",
+    g:[
+      "【第 15 章】暑假她在俄克拉荷马大学读语言学，常爬到体育场最高处看日落、祷告，却发现无论读经、学习还是祷告，满脑子都是吉姆。吉姆的弟弟也在那里，他的侧脸和歌声时时提醒她。作者引用一句话：神的旨意与人的旨意相交时，总得有人死。生活里充满“小小的死”，就是每一次对自己说不、对神说是。",
+      "但我们死，不是为了死，而是为了活。一粒麦子落在地里死了，才结出许多子粒。这需要信心；信心失败，会导致怨恨和消沉。",
+      "【第 16 章】她在日落时学到三件事：云中一小段彩虹，是神信实的应许；金色的云本身只是雾气，是阳光让它发亮；还有约翰福音 12:24。她想到：如果神要我等五年呢？又想：神从亘古到永远的怜悯，会在五年里用完吗？章末一位读者被男生冷落后，学会定期把他交给神，学会“活在现在”。"],
+    look:"第 16 章秋叶落下、冬天沉寂、春天发芽的比喻，很适合在散步时默想。",
+    v:"约翰福音 12:24；诗篇 57:1–3", p:"求神帮助我在放下的时候，仍然相信祂会带来生命。",
+    q:"这个月，我需要经历哪一个“小小的死”？" },
+  { d:12, ch:"第 17 章", en:"What to Do With Loneliness", zh:"如何面对孤单", loc:"PDF 第 80–83 页（书上页码 78–81）· .md 文件第 2198 行",
+    g:[
+      "分开的恋人容易活在过去和将来，白白浪费了现在。作者回复一位读者时，附上她写的小文章《孤单》，里面有几条建议：安静下来认识神；记得你不是一个人；感恩；坚决拒绝自怜；接受孤单只是旅程的一段；把孤单像五饼二鱼一样献给神；为别人做点事。",
+      "吉姆曾写信提醒她：不要让我们的渴望杀死了生活的胃口。她承认自己那时有嫉妒：别人不但有天堂可盼，还有订婚和婚姻。",
+      "关键在于“用对的心态领受”。空椅子、空信箱本身不会让人成熟；我们怎样领受它们，决定了它们在我们身上结出什么。可以悖逆、拒绝，也可以信靠、接受。"],
+    look:"吉姆的一句话：无论你在哪里，都要全然在那里。",
+    k:{ t:"婚姻是天国的预尝", r:"“婚姻是天国的预尝”和“性别‘完整’与单身”两节 · PDF 第 198–202 页",
+      g:[
+        "传统社会逼人结婚；西方流行文化则让人以为，找到真爱才是人生故事的开始。新约不一样。以弗所书 5 章把婚姻看得很高，正因为婚姻是一个记号，指向基督与教会那终极的婚姻，所以它是“次好的”。",
+        "已婚的人如果不明白这一点，就会要婚姻去填补只有神能填满的空缺；单身的人如果不明白，就会对婚姻的梦想期待过高。学会在与基督的关系里安息和喜乐，单身的人就不会自卑，也不必坐等人生开始。",
+        "单身的人怎样经历男女之间的彼此补足？凯勒的回答是教会这个大家庭：弟兄姐妹深入地彼此服侍、分享生命，自然会经历他所说的“跨性别的彼此丰富”。单身的人反而可以和更多同性、异性建立友谊。"],
+      look:"我有没有把结婚当作“真正的人生开始”的那一刻？" },
+    v:"雅各书 1:2–4；申命记 31:8", p:"求神让我好好活在今天，不活在想象的将来里。",
+    q:"今天我可以怎样好好活在“现在”？", act:"列出今天可以服侍别人的三件小事" },
+  { d:13, ch:"第 18 章", en:"What Providence Has Gone and Done", zh:"神的安排", loc:"PDF 第 84–88 页（书上页码 82–86）· .md 文件第 2341 行",
+    g:[
+      "马克·吐温曾抱怨一场暴风雪打乱了他和妻子的旅行计划。作者也问：神难道不能简单地叫我们信靠祂，非要把我们最珍视的东西拿走吗？",
+      "她转向罗马书 8 章：保罗经历鞭打、海难、饥饿，却说没有什么能叫我们与神的爱隔绝。得胜不是免于苦难，而是在苦难中得胜。神的爱没有保护祂的儿子免于十字架，那正是祂爱的证明。",
+      "她幽默地设想问保罗：那感情问题呢？要是我爱的人拒绝我呢？她的意思是：在小事上忠心的，在大事上也忠心。我们要先学会在“小小的”心事里信靠神。"],
+    look:"章末那句：耶稣爱我，不是因为祂照我的意思做，而是因为十字架证明了。",
+    v:"罗马书 8:35–39；加拉太书 2:20", p:"为最近没照我计划发生的事感谢神。",
+    q:"最近哪件事没有照我的计划发生？我从中学到什么？" },
+  { d:14, ch:"第 19 章", en:"The Rebel Sigh", zh:"悖逆的叹息", loc:"PDF 第 89–92 页（书上页码 87–90）· .md 文件第 2494 行",
+    g:[
+      "她常想起那晚说的“灰烬”，也就是空虚。日记里她引用一首诗歌，求神教她压下“悖逆的叹息”，学会未蒙应允之祷告的忍耐。她问：我忘不了吉姆，是神不要我忘，还是我自己不愿意忘？",
+      "她说，最深的功课不是神最后让我们如愿，而是祂让我们等，直到我们能诚实地祷告“愿你的旨意成就”。这个委身几乎每天都要重新确认，这就是天天背起十字架。",
+      "不想顺服时说“我愿意”，算不算说谎？作者说：你爱一个人，就会为他做很多原本不会选的事；因为爱，你可以诚实地说我更想讨祂喜悦。她还说，渴望不需要被除掉，需要的是被约束；如果渴望消失了，我们还有什么可献给神呢？"],
+    look:"她三岁侄女的那句话，还有彼前 5:10 的另一种译法：暂受苦难之后，祂必亲自修补破碎的。",
+    v:"彼得前书 5:10；诗篇 37:5", p:"诚实说出心里的抱怨，再把它交给神。",
+    q:"我有没有对神发出抱怨的叹息？可以诚实写下来。" },
+  { d:15, review:true, en:"中点回顾", zh:"回顾这两周",
+    g:["今天不读新章节。把前两周的日记从头读一遍，看看神怎样带领你。可以留意：哪一章最触动你？哪个默想问题你最难回答？你对这位弟兄的心思，和两周前相比有什么不同？"],
+    v:"耶利米哀歌 3:22–26", p:"为这两周神的同在感恩，并把下半个月交给祂。",
+    q:"这两周，神对我说了什么？我的心有什么变化？", act:"如果愿意，和一位属灵长辈分享你的祷告" },
+
+  { d:16, ch:"第 20 章", en:"Self-deception", zh:"自我欺骗", loc:"PDF 第 93–98 页（书上页码 91–96）· .md 文件第 2620 行",
+    g:[
+      "耶稣有真实的血肉身体，却没有罪，所以身体本身不是罪。那与灵性争战的是什么？人能不能既有人性又圣洁？她盼望自己对吉姆的爱是人性的，也是圣洁的。",
+      "作者说这里很容易自欺。一个女孩说她和一位弟兄是“姐妹兼朋友”，对方只想纯洁地爱她、在主里造就她。作者直说：这听起来不像兄妹，而像恋人。把对婚姻自然的渴望用属灵的词包装起来，是很常见的自欺。",
+      "作者的父亲叮嘱儿子们：在准备好马上求婚之前，不要对女孩说“我爱你”。吉姆没有照这样做，作者说千万不要把他们的情况当成模式。她劝读者在神面前坦白：如果情感被挑起，就向自己和神承认，而不是向对方说；然后把缰绳交给神。"],
+    look:"她怎样解释“治死”（mortify）：不是说情感本身邪恶，而是让它服在圣灵之下。",
+    v:"耶利米书 17:9–10；诗篇 139:23–24", p:"求神鉴察我，看我里面有什么不对的。",
+    q:"我有没有用属灵的话，包装自己的愿望？" },
+  { d:17, ch:"第 21 章", en:"What Women Do to Men", zh:"女人对男人做了什么", loc:"PDF 第 99–103 页（书上页码 97–101）· .md 文件第 2802 行",
+    g:[
+      "作者说，女性常想当主动的一方：把话说开、摊牌，得不到回应就用眼泪、沉默或冷淡施压。她举了几个例子：一个女孩说“神告诉我要嫁给他”，马上打电话告诉对方，之后每隔几天就提醒他；另一个女孩“委婉地”表白被拒后，仍然不停写信、打电话。",
+      "作者说得很直接：他如果爱你，就会来追你；他没有回应，就是清楚的信号。她也请男人小心对待女人。吉姆曾经直接请一个对他有意的女孩吃饭，坦白告诉她：你的感情放错了地方。",
+      "本章结尾：不要玩弄别人的感情。像钓鱼一样“遛”人，很残忍，不诚实，也很危险。"],
+    look:"这章语气很直接。读的时候诚实地对照自己就好，不需要自责。",
+    v:"哥林多前书 13:4–5", p:"求神除去我想控制局面的心。",
+    q:"我有没有用暗示或试探，想推动这段关系？" },
+  { d:18, ch:"第 22 章", en:"What Do Men Look For?", zh:"男人在寻找什么？", loc:"PDF 第 104–108 页（书上页码 102–106）· .md 文件第 2972 行",
+    g:[
+      "作者的母亲只给过她两条建议：让他们来追，保持距离。可是如果他们不追呢？她讲了四个女孩的故事：一个不知道该怎么祷告，一个去质问男生，一个主动约男生，一个一直在等。",
+      "她和丈夫请了一群单身神学生来家里，问他们怎么看女生主动邀约。他们说“吓一跳”“扫兴”。他们欣赏的是：有女人味、会鼓励人、温柔敏锐、在主里有安全感、知足、安静而勇敢；女生有一点谨慎和保留，反而让人感兴趣。",
+      "作者补充了一点：奥秘。男人喜欢觉得女人里面有他看不透的东西。彼得说，女人的美在于里面温柔安静的心。"],
+    look:"神学生们的回答，可以帮你理解弟兄们心里怎么想。",
+    v:"彼得前书 3:3–4", p:"求神培养我里面温柔安静的心。",
+    q:"我愿意把主动权留给神和他吗？" },
+  { d:19, ch:"第 23–24 章", en:"The Mess We’ve Made · Hot Sweats and Wet Feet", zh:"我们造成的混乱·汗水与湿脚", loc:"PDF 第 109–116 页（书上页码 107–114）· .md 文件第 3131 行",
+    g:[
+      "【第 23 章】作者认为男女相处一向微妙，所以历来有各种礼节规范；现在把它们都丢了，带来很多混乱。她从创造的次序来讲：男人被造来主动、保护和照顾，基督追求教会也是这幅图画。章末一个女孩问：那我打电话问他这周需要我为他祷告什么，总可以吧？作者说：你还没有明白。这一章的观点比较传统，可以带着自己的思考去读。",
+      "【第 24 章】作者说最难受的不是等待和分离，而是沉默。她引用卢瑟福：往天国的路上必有风雨和湿脚，天国不会来到床边。以色列人想要韭菜葱蒜，神却用吗哪喂养他们，教他们知道人活着不是单靠食物。",
+      "她心里说：主啊，要么拿走这份渴望，要么给我所渴望的。神的回答是：我要教你渴望更好的。她学会一天一天地吃生命的粮，而不是预支五年的份。"],
+    look:"第 24 章里 Stevenson 那段话：任何人都能把担子背到天黑。",
+    v:"申命记 8:2–3；马太福音 6:34", p:"求神让我不找捷径，愿意走祂的路。",
+    q:"在这段关系里，我有没有在找捷径？" },
+  { d:20, ch:"第 25–26 章", en:"Nobody Knows the Trouble · A Letter at Last", zh:"无人知晓的苦·终于来信", loc:"PDF 第 117–125 页（书上页码 115–123）· .md 文件第 3400 行",
+    g:[
+      "【第 25 章】孤单最容易让人自怜。作者引用一句淡米尔谚语和 Amy Carmichael：如果我暗暗夸大自己的苦，让别人觉得我很“难”，我就还不认识十字架的爱。我们要彼此担当，也要学会背起自己的担子。她的软弱让她惊讶，也让她学到神的恩典够用。她的祷告很简单：为我的孤单、自怜和渴望，求你的力量。",
+      "【第 26 章】1948 年秋天，吉姆觉得神允许他们开始通信。他们曾讨论：对他们来说，结婚会不会等于承认基督不够？如果神不给婚姻，基督必须足够；如果神连婚姻一起赐下，就当作礼物领受。",
+      "吉姆的第一封信说他为三件事战兢：怕自己影响了她的一生，怕心里的“渴望”让别的东西取代神的位置，怕得罪主。他也后悔之前的身体接触，请她在这件事上对他严格，并说：要做比情人更多的，做朋友。"],
+    look:"吉姆在信里用尼希米修城墙比喻“里面的瓦砾”，拦阻工作的常常不是外面的敌人，而是里面的杂乱。",
+    v:"罗马书 8:16–18；哥林多后书 12:9", p:"对神说：“如果答案是不，你对我也是足够的。”",
+    q:"如果答案是“不”，基督对我真的足够吗？" },
+  { d:21, ch:"第 27–28 章", en:"Whetted Appetites · How Much Can a Kiss Tell You?", zh:"被挑起的渴望·一个吻能告诉你多少？", loc:"PDF 第 126–132 页（书上页码 124–130）· .md 文件第 3634 行",
+    g:[
+      "【第 27 章】作者说，基督徒只有一条规矩：婚前完全节制，婚后完全忠诚。他们所谓的身体接触，不过是挽着手、肩并肩坐着。按世人的标准根本不算什么，但他们诚实承认：无法确定那条线在哪里，而这是一股可能失控的力量。对他们来说，贞洁就是不轻看任何与对神的委身不相称的举动或念头。",
+      "【第 28 章】学生问：没吻过怎么知道要不要嫁给他？作者反问：吻过了又怎么知道？亚伯拉罕的仆人为以撒找妻子时，是一边默默祷告一边观察。她也在远处观察吉姆：珍惜时间、热情、学习认真、穿着朴素但不邋遢。",
+      "她说，牵手亲吻不会给她的判断增加什么，反而会减少一些重要的东西。她想嫁给一个敢逆流而上的人。追求清心的人，要准备好被别人当作怪人。"],
+    look:"第 28 章怎样“观察”一个人，很实用，可以对照你对这位弟兄的了解。",
+    k:{ t:"怎样寻求婚姻（上）", r:"“追求婚姻的美好”至“不要与非信徒纠缠太深” · PDF 第 203–211 页",
+      g:[
+        "凯勒观察到，很多人一边过度渴望婚姻，一边又害怕婚姻，于是变成完美主义者，择偶时常被外表和金钱主导。他说，如果婚姻是两个人彼此帮助、成为神要我们成为的新人，找对象的方式就会完全不同。他也描述了两种单身的人：一种因为恐惧，看不见别人的优点；一种因为太迫切，把对方吓跑。",
+        "他简单回顾了约会的历史：从包办婚姻，到男方去女方家里拜访，再到现代约会和今天的“勾搭”文化，然后提出一些实际建议。",
+        "有时候暂时不寻求婚姻是合宜的，比如刚开始工作、搬到新城市、失去亲人或者感情受伤之后。保罗说的“独身的恩赐”，不是没有渴望或挣扎，而是神给的、借着单身去服侍别人的能力；可能持续一生，也可能只是一段时间。",
+        "年纪越大，交往越要认真，不要拿别人的感情当消遣。也不要和不信的人纠缠太深：伴侣若不认同你的信仰，就无法明白你生命最核心的动机，到最后你要么把自己藏起来，要么让对基督的热心冷却下去。"],
+      look:"我更像“害怕婚姻、太挑剔”的那一种，还是“太迫切”的那一种？" },
+    v:"帖撒罗尼迦前书 4:3–7；创世记 24:12–21", p:"求神给我在祷告中观察的眼光。",
+    q:"我用什么标准来观察一个人？" },
+  { d:22, ch:"第 29–30 章", en:"They Abstain From Nothing · A “Small” Sin", zh:"什么都不节制·“小”罪", loc:"PDF 第 133–139 页（书上页码 131–137）· .md 文件第 3814 行",
+    g:[
+      "【第 29 章】纯洁常被误解为压抑，其实纯洁是“没有掺杂”，是照着设计者原本的样子。一个吻是不是罪？她说可能是：它可能磨钝以后的滋味，分散人的心。但她不想做法利赛人，关键是心的方向。他们保持距离，是出于爱，不想成为对方的绊脚石。她引用威伯福斯：名义上的基督徒只是不敢做的才不做；真基督徒是出于感恩，甘心乐意地给出。",
+      "【第 30 章】吉姆写信说，他可以自由地写信，但如果通信伤害到她，他愿意停止，由她来决定。她说继续写。后来吉姆大四那年有一段“文艺复兴”：社交、约会、搞笑，甚至有几次亲吻别的女孩的事传到她耳中，她很受伤。",
+      "吉姆悔改了，向神、向同学、向她认罪。她也学到：他是她的理想，但他也是罪人；她自己也让他失望过很多次。"],
+    look:"她怎样面对理想中的人“不完美”。这对将来的婚姻是很重要的一课。",
+    v:"约翰一书 1:7–9", p:"把心里的“小事”带到神面前认罪。",
+    q:"有没有哪件“小事”，我需要向神认罪？" },
+
+  { d:23, ch:"第 31–32 章", en:"A Cave and a Driftwood Fire · How Do You Say No?", zh:"山洞与篝火·怎样说“不”", loc:"PDF 第 140–146 页（书上页码 138–144）· .md 文件第 4010 行",
+    g:[
+      "【第 31 章】整整一年没见面，她在加拿大一个叫 Patience（忍耐）的偏远地方做主日学宣教。吉姆的母亲邀请她去波特兰，她来回挣扎该不该去，最后还是去了。吉姆的母亲劝她“逼他一下，要么现在要么永远不”，她没有照做。",
+      "两人去海边，在山洞里探险，生起篝火看日落，诱惑几乎压倒他们。因为早就做了选择，靠着神的恩典，他们没有越界。作者也警告：如果你对神还没有把握，就别去偏僻的山洞和篝火边。",
+      "【第 32 章】怎样说不？简单的答案是：嘴上说不，身体离开。简单，但不容易。要求主帮助，祂一定会帮。受试探不是罪，顺从试探才是。动机不必完全纯净才能得到帮助，两人的意志已经交给神，祂就扶持他们走过来。"],
+    look:"第 32 章结尾 Sara Teasdale 的小诗：我怎能给他一生的沉默？",
+    v:"提摩太后书 2:22；哥林多前书 10:13", p:"求神赐我智慧和勇气，守住界限。",
+    q:"在相处中，我自己的界限是什么？", act:"写下一两条你想守住的界限" },
+  { d:24, ch:"第 33–34 章", en:"Four Bare Legs · His Sublime Keeping", zh:"路易斯的比喻·祂奇妙的保守", loc:"PDF 第 147–153 页（书上页码 145–151）· .md 文件第 4222 行",
+    g:[
+      "【第 33 章】作者认为，在男人的情欲面前，女人往往握着钥匙：她要求他多绅士，他就多绅士。很多男人送女孩回家时，心里想“好像得吻她一下”，女孩表示不要，他反而松了一口气。人总是珍惜得来不易的东西，她自己也喜欢把最好的留到最后。凡事都有定时，拥抱有时，不拥抱有时。要守住贞洁就得划线，不要把自己放进线会变模糊的处境。章名来自路易斯《返璞归真》里的一个讽刺比喻。",
+      "【第 34 章】之后几年他们聚少离多：在她哥哥的婚礼上见了两天，又分开一年。1951 年吉姆来东部，他们一起野餐，在纽约看电影，站在高楼上看城市灯火。吉姆暗示神也许会让他们在一起，但仍然没有“绿灯”。",
+      "在新罕布什尔爬山时，吉姆指着溪水说：水流被石头分成两股，最后在深潭汇合，这是我们的寓言。"],
+    look:"第 34 章她引用 Upham：把心爱的事放在神“奇妙的保守”之中。",
+    v:"传道书 3:1–8；犹大书 24–25", p:"为神到现在的保守感恩。",
+    q:"在相处中，我给对方的是怎样的信号？" },
+  { d:25, ch:"第 35–36 章", en:"Impatience · I Have You Now Unravished", zh:"不耐烦·我保有未被夺取的你", loc:"PDF 第 154–158 页（书上页码 152–156）· .md 文件第 4409 行",
+    g:[
+      "【第 35 章】作者说，对一个恋爱中的女人最难忍受的，也是吉姆品格最好的证明，就是他对自己能力的克制。她谈到急着结婚却还没想好怎样养家的情侣，也谈到“稳定交往”：还没准备好订婚，却又不肯把对方交在神手里，怕他跑掉。她问：一个男人还没准备求婚，凭什么要一个女人只关注他？",
+      "本章最后是一首祷告诗，求神在风暴中坚固我们的意志，叫我们在平静安稳中等候。",
+      "【第 36 章】1951 年 10 月，他们第一次合照。吉姆随后在信里说时时想她，但他并不觉得爱她和爱神有冲突。他也写道，很高兴他们还没有那种“经验”，现在拥有的是未被夺取的她，他觉得必须为她保守自己。"],
+    look:"第 35 章那几个问题，对正在了解一个人的你很有帮助。",
+    k:{ t:"怎样寻求婚姻（下）", r:"“在最全面的意义上感受吸引力”至本章结束 · PDF 第 211–218 页",
+      g:[
+        "凯勒讲“全面的吸引力”。保罗并不反对因爱而结婚，身体的吸引是重要的；但更深的吸引，是被对方的品格、圣灵的果子、他将来在神手中会成为的样子所吸引。他借路易斯讲“神秘之线”：两个人被同样的事物触动，而这些事物都指向神。放下“金钱、外表、面子”这套筛选标准，你可能会被原本不会考虑的人吸引。",
+        "不要过早点燃激情。迷恋会让人看不清对方，所以最好在教会生活和一起服侍中，看见彼此平常真实的样子。检验是否已经过了迷恋期，可以问：我们一起经历并解决过严重的冲突吗？走过一轮悔改和饶恕吗？双方都愿意为对方改变吗？",
+        "如果对方不愿意委身，就不要做他“不是恋人的恋人”。凯勒讲了妻子凯西当年对他说的一番话：她不想一直付出、无限期地等下去。他这才醒悟，几个星期后做了决定。",
+        "走向婚姻的每一步，都要听取基督徒群体的意见，婚姻不只是一个人的决定。已婚的人也应该向单身的人敞开家门，让他们看到婚姻真实的样子，包括艰难的部分。"],
+      look:"我有没有机会在群体生活里看到他平常真实的样子？我愿意请谁给我意见？" },
+    v:"以赛亚书 30:15", p:"求神让我在平静安稳中得力。",
+    q:"我在哪里最不耐烦？我在他身上看到了怎样的品格？" },
+  { d:26, ch:"第 37–38 章", en:"Hold God to His Bargain · God Granted and God Denied", zh:"抓住神的应许·神应允的与神拒绝的", loc:"PDF 第 159–167 页（书上页码 157–165）· .md 文件第 4557 行",
+    g:[
+      "【第 37 章】1952 年初，吉姆准备去厄瓜多尔。她也因为一些事情的引导转向厄瓜多尔，明知会被人说是追着他去。吉姆写信说，旧约的写实显出神喜悦人间的爱。出发前一晚他打来长途电话说爱她，她回答：我情不自禁。",
+      "在船上他写道：我们为天国的缘故单身，“我的家可以空一些，只要祂的家满一些”。他也说，想象中的失去不是真的失去，不要让渴望杀死生活的胃口。",
+      "【第 38 章】他们在基多一起学西班牙语四个月，几乎天天见面，之后吉姆去东部丛林，她去西部。作者用种子、花苞、花瓣、果实讲“放手”：在哪里拒绝放手，成长就在哪里停止。吉姆写道：这份渴望本身是好的，是神允许的，但现在神拒绝了，也没有告诉我全部理由。后来他们也看见一些智慧：分开让两人都能专心做各自的工作。"],
+    look:"第 38 章结尾的三问三答，可以抄下来。",
+    v:"马太福音 16:25；诗篇 84:11", p:"为神的应允感谢，也学习为神的拒绝感谢。",
+    q:"我能为神的拒绝感谢吗？" },
+  { d:27, ch:"第 39–40 章", en:"Confused Rollings and Wheels · Love Letters", zh:"纷乱的车轮·情书", loc:"PDF 第 168–177 页（书上页码 166–175）· .md 文件第 4792 行",
+    g:[
+      "【第 39 章】两人隔着两道安第斯山脉，一封信来回要六个星期。吉姆在信里坦白，基多那几个月之后，他的渴望比以前更强烈。圣诞节他没能来基多，她觉得他不够努力，心里起了怀疑。",
+      "多年后她承认：从人的角度看，她的怀疑有道理；但她应该在他身上信靠神。她引用林前 13 章和卢瑟福：不要把目光停在“第二因”纷乱的车轮上，要仰望掌管一切的神。信靠神，就是把属于对方的决定留给对方，不操纵、不催逼。",
+      "【第 40 章】下一封信让她明白，吉姆其实想她想到失眠。1953 年 1 月，一封电报说他在基多等她。她骑马、搭香蕉卡车赶去。那天晚上在炉火旁，等了近五年的吉姆向她求婚，并第一次吻了她。之后的情书变得热烈而直白。"],
+    look:"第 40 章收录了一些很直白的婚前情书。作者想说明激情本身是美好的，只是要等神的时间。",
+    v:"箴言 13:12；诗篇 27:14", p:"把属于他的决定交还给他，也交给神。",
+    q:"有哪些决定其实属于他，而我想替他做？" },
+  { d:28, ch:"第 41 章", en:"This Is Our God—We Have Waited for Him", zh:"这是我们的神，我们等候了祂", loc:"PDF 第 178–181 页（书上页码 176–179）· .md 文件第 5053 行",
+    g:[
+      "吉姆来到她所在的村子看她。他们谈到将来在丛林里的家，却定不下婚期：吉姆答应先为另外两个宣教家庭盖房子。她心里有些怨气：为什么总是别人优先？吉姆提出的结婚条件之一，是她要先学会丘亚语。",
+      "后来一场大洪水，一夜之间冲走了宣教站的全部房屋和一大段跑道。同工们认为神另有安排，决定让吉姆和她去南部一个需要学校和宣教士的地方。",
+      "1953 年 10 月 8 日，他们在基多结婚。那天给他们的经文是以赛亚书 25:9：看哪，这是我们的神，我们素来等候祂。作者说，这等候无比值得。"],
+    look:"神打开道路的方式，常常出人意料。",
+    v:"以赛亚书 25:9", p:"写下一个愿意继续等候的祷告。",
+    q:"我在等候的，究竟是一个人，还是神自己？" },
+  { d:29, ch:"第 42–43 章", en:"Out of Love and Into Charity · A New Act of Creation", zh:"从坠入爱河到仁爱·新的创造", loc:"PDF 第 182–190 页（书上页码 180–188）· .md 文件第 5163 行",
+    g:[
+      "【第 42 章】纯洁不在婚礼那天结束。婚前的纯洁，是为顺服神而彼此持守；婚后的纯洁，是为顺服神而把自己给对方。驾驭激情的原则是爱，不是感觉。她回信给一个不断“坠入爱河又爬出来”的年轻人，引用路易斯：恋爱的感觉像点火时的爆炸，真正让婚姻运转的，是一种更安静的爱，靠意志、习惯和神的恩典维持。",
+      "她说，婚姻里谈到权利，总是指对方的权利，而不是自己的。还记得恋爱时觉得对方全然美丽吗？那是神让你短暂看见祂造这个人时的心意；婚后看到对方的缺点时，要记得那个异象。",
+      "【第 43 章】“我已经搞砸了，回不去了。”作者说，耶稣正是为搞砸的人来的。在基督里就是新造的人，旧事已过。结尾讲了一个苏格兰老牧师在圣餐台前对一个哭泣女孩说的话：这饼是给罪人的。"],
+    look:"第 42 章给那个年轻人的回信，是很好的婚前提醒，可以将来再读一次。",
+    v:"约翰福音 15:9–10；哥林多后书 5:17", p:"求神预备我，带着基督的爱进入将来的婚姻。",
+    q:"我想带着怎样的爱进入婚姻？" },
+  { d:30, review:true, en:"总回顾与献上", zh:"把这个月献给神",
+    g:["重读整本祷告日记，把这个月学到的整理下来。可以回到第 1 天的默想问题，看看你现在会怎样回答。最后把这段关系、你的心和你的将来，再一次交给神。"],
+    v:"诗篇 37:4–7", p:"把这段关系、你的心和你的将来，再一次完全交给神。",
+    q:"这个月我学到最重要的三件事是什么？接下来我要怎样祷告？", act:"写一封信给神，或者写给未来的配偶" },
+];
+
+const KEY = "waiting30";
+let state = { done: [], start: "" };
+try { const s = JSON.parse(localStorage.getItem(KEY) || "null"); if (s) state = Object.assign(state, s); } catch (e) {}
+function save() { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {} }
+
+function esc(s) { return String(s).replace(/[&<>"]/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;" }[c])); }
+function para(s) {
+  const m = s.match(/^【(.+?)】(.*)$/);
+  return m ? `<p><b>${esc(m[1])}</b>${esc(m[2])}</p>` : `<p>${esc(s)}</p>`;
+}
+
+function todayIndex() {
+  if (!state.start) return null;
+  const s = new Date(state.start + "T00:00:00"), n = new Date();
+  n.setHours(0,0,0,0);
+  return Math.floor((n - s) / 86400000) + 1;
+}
+
+function updateCount() {
+  const n = state.done.length;
+  document.getElementById("count").textContent = `已完成 ${n} / 30 天`;
+  document.getElementById("bar").style.width = (n / 30 * 100) + "%";
+}
+
+function render() {
+  const t = todayIndex();
+  document.getElementById("weeks").innerHTML = WEEKS.map(w => `
+    <section>
+      <div class="week-head"><h2>${w.title}</h2><p>${w.sub}</p></div>
+      <div class="days">
+        ${DAYS.filter(x => x.d >= w.from && x.d <= w.to).map(x => {
+          const done = state.done.includes(x.d);
+          const cls = ["day", x.review ? "review" : "", done ? "done" : "", t === x.d ? "today" : ""].join(" ");
+          return `<details class="${cls}" id="day-${x.d}" ${t === x.d ? "open" : ""}>
+            <summary>
+              <input type="checkbox" class="chk" id="chk-${x.d}" data-d="${x.d}" ${done ? "checked" : ""} aria-label="第 ${x.d} 天完成">
+              <span class="dnum">DAY ${x.d}</span>
+              <span class="stitle"><b>${esc(x.zh)}${x.review ? '<span class="tag">回顾日</span>' : ""}${x.k ? '<span class="tag">+ 凯勒</span>' : ""}</b><span>${x.ch ? esc(x.ch) + " · " : ""}${esc(x.en)}</span></span>
+              <span class="caret" aria-hidden="true">▶</span>
+            </summary>
+            <div class="body">
+              ${x.loc ? `<div class="loc">今天读：${esc(x.loc)}</div>` : ""}
+              <div class="guide">
+                <h3>${x.review ? "今天怎么做" : "中文导读"}</h3>
+                ${x.g.map(para).join("")}
+                ${x.look ? `<p class="look">读的时候留意：${esc(x.look)}</p>` : ""}
+              </div>
+              ${x.k ? `<div class="guide keller">
+                <h3>凯勒补充阅读：${esc(x.k.t)}</h3>
+                <p class="krange">${esc(x.k.r)}</p>
+                ${x.k.g.map(para).join("")}
+                <p class="look">想一想：${esc(x.k.look)}</p>
+              </div>` : ""}
+              <div class="row"><span>经文</span><span>${esc(x.v)}</span></div>
+              <div class="row"><span>祷告</span><span>${esc(x.p)}</span></div>
+              <div class="row q"><span>默想</span><span>${esc(x.q)}</span></div>
+              ${x.act ? `<div class="row"><span>行动</span><span>${esc(x.act)}</span></div>` : ""}
+            </div>
+          </details>`;
+        }).join("")}
+      </div>
+    </section>`).join("");
+
+  updateCount();
+  const note = document.getElementById("todayNote");
+  if (t === null) note.textContent = "选一个开始日期，页面会自动展开当天的内容。";
+  else if (t < 1) note.textContent = `还有 ${1 - t} 天开始。`;
+  else if (t > 30) note.textContent = "三十天已经走完。可以从第 30 天的回顾开始，决定接下来怎样继续。";
+  else note.textContent = `今天是第 ${t} 天：${DAYS[t - 1].zh}`;
+}
+
+const weeksEl = document.getElementById("weeks");
+weeksEl.addEventListener("click", e => { if (e.target.classList.contains("chk")) e.stopPropagation(); });
+weeksEl.addEventListener("change", e => {
+  if (!e.target.classList.contains("chk")) return;
+  const d = +e.target.dataset.d;
+  state.done = e.target.checked ? [...new Set([...state.done, d])] : state.done.filter(x => x !== d);
+  save();
+  e.target.closest("details").classList.toggle("done", e.target.checked);
+  updateCount();
+});
+const startEl = document.getElementById("start");
+startEl.value = state.start || "";
+startEl.addEventListener("change", () => { state.start = startEl.value; save(); render(); });
+render();
+</script>
